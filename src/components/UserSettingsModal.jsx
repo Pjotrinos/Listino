@@ -35,7 +35,7 @@ function UserSettingsModal({people, setPeople }) {
 
   function addUser() {
     let i = Math.floor(Math.random() * 10);
-    const RandomAvatar = `https://i.pravatar.cc/150?u=a04258${i}4e29026${i}2d`;
+    const RandomAvatar = `https://i.pravatar.cc/150?u=a04258${i*2}4e29026${i*2}2d`;
 
     setPeople([
       {

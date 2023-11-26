@@ -19,7 +19,6 @@ import Icon from "@mdi/react";
 import { mdiDotsHorizontal } from "@mdi/js";
 
 function ListOfTasks({ data, DeleteTask, showChecked, ChangeTask }) {
-  console.log(data);
   const [taskText, setTaskText] = useState(data.taskText);
   const [isChanging, setIsChanging] = useState(false);
 

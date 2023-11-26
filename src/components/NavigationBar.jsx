@@ -1,11 +1,13 @@
 import React from 'react'
 
-import {Navbar, NavbarBrand, NavbarContent, NavbarItem, Link, Button} from "@nextui-org/react";
+import {Navbar, NavbarBrand, NavbarContent, NavbarItem, Button,Link} from "@nextui-org/react";
+import { Link as Linker } from "react-router-dom";
 
 import Icon from '@mdi/react';
 import { mdiListBox } from '@mdi/js';
 
 function NavigationBar() {
+
   return (
     <Navbar>
     <NavbarBrand>
@@ -14,16 +16,16 @@ function NavigationBar() {
     </NavbarBrand>
     <NavbarContent className="hidden sm:flex gap-4" justify="center">
       <NavbarItem>
-        <Link color="foreground" href="#">
-          My lists
+        <Link color="foreground">
+          <Linker to={"home"}>Home</Linker>
         </Link>
       </NavbarItem>
 
-      <NavbarItem>
+      {/* <NavbarItem>
         <Link color="foreground" href="#">
           Shared with me
         </Link>
-      </NavbarItem>
+      </NavbarItem> */}
 
     </NavbarContent>
     <NavbarContent justify="end">

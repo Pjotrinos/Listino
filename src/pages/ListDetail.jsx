@@ -15,78 +15,70 @@ import { mdiCheckCircle } from "@mdi/js";
 import SettingsModal from "../components/SettingsModal";
 import UserSettingsModal from "../components/UserSettingsModal";
 
+// react router
+import { useParams } from "react-router-dom";
+
+// state managment
+import { useAtom } from "jotai";
+import { ListsAtom } from "../../state-managment";
+
 function ListDetail() {
-  const [tasks, setTasks] = useState([
-    {taskText: 'Mléko', isDone: false, id: "1"},
-    {taskText: 'Dort', isDone: false, id: "2"},
-    {taskText: 'Štafle', isDone: true, id: "3"},
-    {taskText: 'Provaz', isDone: false, id: "4"},
-    {taskText: 'Konfety', isDone: false, id: "5"},
-    {taskText: 'Plyšák', isDone: true, id: "6"}
-  ]);
+  const { id } = useParams();
 
-  const [taskListInfos, setTaskListInfos] = useState({
-    listName: "Nákupní seznam pro oslavu",
-    description: "seznam věcích potřebných na oslavu",
-    imageLink:
-      "https://images.unsplash.com/photo-1601600576337-c1d8a0d1373c?auto=format&fit=crop&q=80&w=3537&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    shareStatust: false,
-  });
-
-  let MockupPeople = [
-    {
-      avatar: "https://i.pravatar.cc/150?u=a042581f4e29026024d",
-      name: "Janus Veliky",
-    },
-    {
-      avatar: "https://i.pravatar.cc/150?u=a04258a2462d826712d",
-      name: "Venuše Zákaznicá",
-    },
-    {
-      avatar: "https://i.pravatar.cc/150?u=a04258b2462d826712e",
-      name: "Lukáš Novák",
-    },
-    {
-      avatar: "https://i.pravatar.cc/150?u=a04258c2462d826712f",
-      name: "Eva Pospíšilová",
-    },
-    {
-      avatar: "https://i.pravatar.cc/150?u=a04258d2462d826712g",
-      name: "Martin Novotný",
-    },
-    {
-      avatar: "https://i.pravatar.cc/150?u=a04258e2462d826712h",
-      name: "Anna Kovářová",
-    }
-  ];
-  const [people, setPeople] = useState(MockupPeople);
-
-  const [IsShowChecked, setIsShowChecked] = useState(false);
-
+  const [lists, setLists] = useAtom(ListsAtom);
+  const [inextino, setInextino] = useState(lists.findIndex((element) => element.id === id));
+  const [IsShowChecked, setIsShowChecked] = useState(false);     
+  
   //task methods
   function CreateNewTask() {
-    setTasks([
+
+    let helper = lists;
+    helper[inextino].tasks = [
       {
         taskText: "",
         isDone: false,
         id: Math.random().toString(36).substring(2),
       },
-      ...tasks,
-    ]);
+      ... helper[inextino].tasks,
+    ]
+    setLists([...helper])
   }
 
-  function DeleteTask(id) {
-    const RemoveOnIndex = tasks.findIndex((element) => element.id === id);
-    setTasks([
-      ...tasks.slice(0, RemoveOnIndex),
-      ...tasks.slice(RemoveOnIndex + 1),
-    ]);
+  function DeleteTask(id) { 
+    let helper = lists;
+    const RemoveOnIndex = helper[inextino].tasks.findIndex((element) => element.id === id);
+
+    helper[inextino].tasks = [
+      ... helper[inextino].tasks.slice(0, RemoveOnIndex),
+      ... helper[inextino].tasks.slice(RemoveOnIndex + 1),
+    ]
+    console.log(helper[inextino].tasks,RemoveOnIndex);
+    setLists([...helper])
   }
 
   function ChangeTask(id, value) {
-    const Index = tasks.findIndex((element) => element.id === id);
-    tasks[Index] = { ...tasks[Index], ...value };
-    setTasks([...tasks]);
+    let helper = lists;
+    const Index = helper[inextino].tasks.findIndex((element) => element.id === id);
+    helper[inextino].tasks[Index] = { ...helper[inextino].tasks[Index], ...value };
+    setLists([...helper])
+  }
+
+  function Updatesettings(data){
+    let helper = lists;
+    helper[inextino] = {
+      ... helper[inextino],
+      ... data
+    }
+    setLists([...helper])
+  }
+
+  function UpdatePeople(data){
+    let helper = lists;
+    helper[inextino].sharedUsers = [
+      ... data
+    ]
+    console.log(helper[inextino].sharedUsers)
+    setLists([...helper])
   }
 
   return (
@@ -99,7 +91,7 @@ function ListDetail() {
       >
         <Image
           // removeWrapper={true}
-          src={taskListInfos.imageLink}
+          src={lists[inextino].imageLink}
           alt="Cropped Image"
           layout="fill"
           objectFit="cover"
@@ -107,28 +99,35 @@ function ListDetail() {
       </div>
 
       <div className="flex flex-row justify-between">
-      <p className="font-bold text-3xl">{taskListInfos.listName}</p>
-      <SettingsModal
-        inputSettings={taskListInfos}
-        ReflectChanges={setTaskListInfos}
-      />
+        <p className="font-bold text-3xl">{lists[inextino].listName}</p>
+        <SettingsModal
+          inputSettings={lists[inextino]}
+          ReflectChanges={Updatesettings}
+          AcceptButtonText={"Save Changes"}
+          Text={"Settings"}
+        />
       </div>
 
-      <p> {taskListInfos.description}</p>
+      <p> {lists[inextino].description}</p>
 
       <div className="flex justify-between">
         <AvatarGroup
           max={5}
-          total={people.length}
+          total={lists[inextino].sharedUsers.length}
           renderCount={(count) => (
             <p className="text-small text-foreground font-medium ml-2">
               +{count} others
             </p>
           )}
         >
-            {people.slice(0, 4).map(element => <Avatar src={element.avatar} />)}
+          {lists[inextino].sharedUsers.slice(0, 4).map((element) => (
+            <Avatar src={element.avatar} />
+          ))}
           <Button color="default" isIconOnly radius="full">
-            <UserSettingsModal people={people} setPeople={setPeople}></UserSettingsModal>
+            <UserSettingsModal
+              people={lists[inextino].sharedUsers}
+              setPeople={UpdatePeople}
+            ></UserSettingsModal>
           </Button>
         </AvatarGroup>
 
@@ -154,7 +153,7 @@ function ListDetail() {
       </div>
 
       <div className="flex flex-col justify-center gap-y-2.5">
-        {tasks.map((task) => (
+        {lists[inextino].tasks.map((task) => (
           <ListOfTasks
             data={task}
             showChecked={IsShowChecked}

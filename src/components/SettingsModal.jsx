@@ -18,7 +18,7 @@ import Icon from "@mdi/react";
 import { mdiCog } from "@mdi/js";
 
 
-function SettingsModal({ inputSettings, ReflectChanges }) {
+function SettingsModal({ inputSettings, ReflectChanges, AcceptButtonText,Text , buttonColor, noIcon }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const [formData, setFormData] = useState(inputSettings);
@@ -44,7 +44,7 @@ function SettingsModal({ inputSettings, ReflectChanges }) {
   return (
     <>
       <div>
-        <Button onPress={() => handleOpen()}> <Icon path={mdiCog} size={1} /> List Settings </Button>
+        <Button color={buttonColor} onPress={() => handleOpen()}> {noIcon===true ? null : <Icon path={mdiCog} size={1} />} {Text} </Button>
       </div>
 
       <Modal
@@ -57,7 +57,7 @@ function SettingsModal({ inputSettings, ReflectChanges }) {
             <>
               <ModalHeader className="flex flex-row gap-1">
                 {" "}
-                <Icon path={mdiCog} size={1} /> Setings
+                {noIcon===true ? null : <Icon path={mdiCog} size={1} />} {Text}
               </ModalHeader>
               <ModalBody>
                 <Input
@@ -94,7 +94,7 @@ function SettingsModal({ inputSettings, ReflectChanges }) {
                   Close
                 </Button>
                 <Button color="primary" onPress={handleFormSubmit}>
-                  Save Changes
+                {AcceptButtonText}
                 </Button>
               </ModalFooter>
             </>
