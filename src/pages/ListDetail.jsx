@@ -1,5 +1,5 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ListOfTasks from "../components/ListOfTasks";
 
 import { Button } from "@nextui-org/react";
@@ -15,6 +15,9 @@ import { mdiCheckCircle } from "@mdi/js";
 import SettingsModal from "../components/SettingsModal";
 import UserSettingsModal from "../components/UserSettingsModal";
 
+import 'ldrs/ring'
+
+
 // react router
 import { useParams } from "react-router-dom";
 
@@ -25,73 +28,141 @@ import { ListsAtom } from "../../state-managment";
 function ListDetail() {
   const { id } = useParams();
 
+  const [listId, setlistId] = useState(id);
+
   const [lists, setLists] = useAtom(ListsAtom);
-  const [inextino, setInextino] = useState(lists.findIndex((element) => element.id === id));
-  const [IsShowChecked, setIsShowChecked] = useState(false);     
+  
+  const [IsShowChecked, setIsShowChecked] = useState(false);
+  
+  
+  const [fetchList, setfetchList] = useState({});
+  const [fetchState,setFetchState] = useState("pending");
+  
+  useEffect(()=>{
+    fetch("/api/list/"+id)
+      .then(res => res.json())
+      .then(json =>{ 
+        setfetchList(json.listino)
+        setFetchState("sucess")
+      })
+      .catch(e =>{ 
+        console.error(e.message)
+        setFetchState("error")
+      })
+  },[])
   
   //task methods
-  function CreateNewTask() {
-
-    let helper = lists;
-    helper[inextino].tasks = [
+  async function CreateNewTask() {
+    console.log("heloo");
+    let helper = fetchList
+    helper.tasks = [
       {
         taskText: "",
         isDone: false,
         id: Math.random().toString(36).substring(2),
       },
-      ... helper[inextino].tasks,
+      ... fetchList.tasks,
     ]
-    setLists([...helper])
+
+    const response = await fetch("/api/list/"+id+"/update", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(helper),
+    });
+
+
+    setfetchList({...helper})
   }
 
-  function DeleteTask(id) { 
-    let helper = lists;
-    const RemoveOnIndex = helper[inextino].tasks.findIndex((element) => element.id === id);
+  async function DeleteTask(id) { 
+    let helper = fetchList;
+    const RemoveOnIndex = helper.tasks.findIndex((element) => element.id === id);
 
-    helper[inextino].tasks = [
-      ... helper[inextino].tasks.slice(0, RemoveOnIndex),
-      ... helper[inextino].tasks.slice(RemoveOnIndex + 1),
+    helper.tasks = [
+      ... helper.tasks.slice(0, RemoveOnIndex),
+      ... helper.tasks.slice(RemoveOnIndex + 1),
     ]
-    console.log(helper[inextino].tasks,RemoveOnIndex);
-    setLists([...helper])
+
+    const response = await fetch("/api/list/"+listId+"/update", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(helper),
+    });
+
+    setfetchList({...helper})
   }
 
-  function ChangeTask(id, value) {
-    let helper = lists;
-    const Index = helper[inextino].tasks.findIndex((element) => element.id === id);
-    helper[inextino].tasks[Index] = { ...helper[inextino].tasks[Index], ...value };
-    setLists([...helper])
+  async function ChangeTask(id, value) {
+    let helper = fetchList;
+    const Index = helper.tasks.findIndex((element) => element.id === id);
+    helper.tasks[Index] = { ...helper.tasks[Index], ...value };
+
+    const response = await fetch("/api/list/"+listId+"/update", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(helper),
+    });
+
+    setLists({...helper})
   }
 
-  function Updatesettings(data){
+  async function Updatesettings(data){
     let helper = lists;
     helper[inextino] = {
       ... helper[inextino],
       ... data
     }
+
+    const NewList = {
+        ... helper[inextino],
+        ... data
+      }
+    
+
+    const response = await fetch("/api/list/"+id+"/update", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(NewList),
+    });
+
+
     setLists([...helper])
   }
 
-  function UpdatePeople(data){
-    let helper = lists;
-    helper[inextino].sharedUsers = [
+  async function UpdatePeople(data){
+    let helper = fetchList;
+    helper.sharedUsers = [
       ... data
     ]
-    console.log(helper[inextino].sharedUsers)
-    setLists([...helper])
+    const response = await fetch("/api/list/"+listId+"/update", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(helper),
+    });
+
+    setLists({...helper})
   }
 
   return (
-    <div class="flex flex-col gap-4 mx-20 ">
-      <div class="flex justify-end"></div>
-
-      <div
+    <div className="flex flex-col gap-4 mx-20 ">
+    { fetchState === "pending" ? <div className="flex flex-row justify-center"> <l-ring className="absolute inset-0" size="60" /> </div> :   
+      <><div
         className="h-56 relative overflow-hidden"
         style={{ borderRadius: "var(--nextui-radius-large)" }}
-      >
+      > 
         <Image
           // removeWrapper={true}
-          src={lists[inextino].imageLink}
+          src={fetchList.imageLink}
           alt="Cropped Image"
           layout="fill"
           objectFit="cover"
@@ -99,33 +170,33 @@ function ListDetail() {
       </div>
 
       <div className="flex flex-row justify-between">
-        <p className="font-bold text-3xl">{lists[inextino].listName}</p>
+        <p className="font-bold text-3xl">{fetchList.listName}</p>
         <SettingsModal
-          inputSettings={lists[inextino]}
+          inputSettings={fetchList}
           ReflectChanges={Updatesettings}
           AcceptButtonText={"Save Changes"}
           Text={"Settings"}
         />
       </div>
 
-      <p> {lists[inextino].description}</p>
+      <p> {fetchList.description}</p>
 
       <div className="flex justify-between">
         <AvatarGroup
           max={5}
-          total={lists[inextino].sharedUsers.length}
+          total={fetchList.sharedUsers.length}
           renderCount={(count) => (
             <p className="text-small text-foreground font-medium ml-2">
               +{count} others
             </p>
           )}
         >
-          {lists[inextino].sharedUsers.slice(0, 4).map((element) => (
+          {fetchList.sharedUsers.slice(0, 4).map((element) => (
             <Avatar src={element.avatar} />
           ))}
           <Button color="default" isIconOnly radius="full">
             <UserSettingsModal
-              people={lists[inextino].sharedUsers}
+              people={fetchList.sharedUsers}
               setPeople={UpdatePeople}
             ></UserSettingsModal>
           </Button>
@@ -153,7 +224,7 @@ function ListDetail() {
       </div>
 
       <div className="flex flex-col justify-center gap-y-2.5">
-        {lists[inextino].tasks.map((task) => (
+        {fetchList.tasks.map((task) => (
           <ListOfTasks
             data={task}
             showChecked={IsShowChecked}
@@ -163,6 +234,8 @@ function ListDetail() {
           />
         ))}
       </div>
+      </>
+    }
     </div>
   );
 }

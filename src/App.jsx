@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ListDetail from "./pages/listDetail";
 import ListOfLists from "./pages/ListOfLists";
 
@@ -15,16 +15,19 @@ function App() {
     status: "Active",
   };
 
+
   return (
+    <>
     <Router>
         <NavigationBar/>
         <div>
         <Routes>
           <Route exact path="/list/:id" element={<ListDetail />} />
-          <Route exact path="/home" element={<ListOfLists />} />
+          <Route exact path="/" element={<ListOfLists />} />
         </Routes>
       </div>
     </Router>
+    </>
   );
 }
 

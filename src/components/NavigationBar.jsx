@@ -17,7 +17,7 @@ function NavigationBar() {
     <NavbarContent className="hidden sm:flex gap-4" justify="center">
       <NavbarItem>
         <Link color="foreground">
-          <Linker to={"home"}>Home</Linker>
+          <Linker to={""}>Home</Linker>
         </Link>
       </NavbarItem>
 
