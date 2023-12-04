@@ -201,8 +201,10 @@ new Server({
 //   },
 // ]);
 
+
+
 ReactDOM.createRoot(document.getElementById("root")).render(
   <NextUIProvider>
-    <App />
+       <App />
   </NextUIProvider>
 );

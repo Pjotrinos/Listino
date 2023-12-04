@@ -8,6 +8,11 @@ import Icon from "@mdi/react";
 import { mdiDotsHorizontal } from "@mdi/js";
 
 import { Chip } from "@nextui-org/react";
+import { useWindowSize } from "@uidotdev/usehooks";
+
+import { useAtom } from "jotai";
+import { leangueBookAtom, langueSelectAtom }  from '../../state-managment';
+
 
 import {
   Dropdown,
@@ -26,6 +31,24 @@ function ListAsCard({
   isArchived,
 }) {
   const navigate = useNavigate();
+  
+  const size = useWindowSize();
+  const sizePrefix = setSizePrefix(size)
+  
+  function setSizePrefix(sizeNow){
+    if(sizeNow<=640){
+      return "sm"
+    }
+    else if(sizeNow<=768){
+      return "md"
+    }
+    else if(sizeNow<=1024){
+      return "lg"
+    }
+  }
+
+  const [leangueBook] = useAtom(leangueBookAtom)
+  const [langueSelect] = useAtom(langueSelectAtom)
 
   return (
     <>
@@ -37,23 +60,24 @@ function ListAsCard({
           onPress={() => navigate("/list/" + id)}
         >
           <CardBody className="overflow-visible py-2">
-        
               <div
-                className="h-56 relative overflow-hidden"
+                className="max-h-20 sm:max-h-20 md:max-h-40 lg:max-h-30 bg-cover relative overflow-hidden"
                 style={{ borderRadius: "var(--nextui-radius-large)" }}
               >
-                <Image
-                  src={imageUrl}
-                  alt="Cropped Image"
-                  layout="fill"
-                  objectFit="cover"
-                  style={
-                    isArchived === true ? { filter: "grayscale(100%)" } : null
-                  }
-                />
+                  <Image
+                    className="wm-min-full h-min-full"
+                    src={imageUrl}
+                    alt="Cropped Image"
+                    layout="fill"
+                    objectFit="cover"
+                    style={
+                      isArchived === true ? { filter: "grayscale(100%)" } : null
+                    }
+                  />
+
                 <div className="absolute top-0 left-0 p-3 z-10">
                   {isArchived === true ? (
-                    <Chip className="mb-4">Archived list</Chip>
+                    <Chip className="mb-4">{leangueBook[langueSelect].text_archiveState}</Chip>
                   ) : null}
                 </div>
                 <div className="absolute top-0 right-0 p-3">
@@ -75,8 +99,8 @@ function ListAsCard({
                         onClick={() => DeleteList(id)}
                       >
                         {isArchived === true
-                          ? "Rebirth list form archive"
-                          : "Archive list"}
+                          ? leangueBook[langueSelect].text_unArchiveList
+                          : leangueBook[langueSelect].text_archiveList}
                       </DropdownItem>
                     </DropdownMenu>
                   </Dropdown>

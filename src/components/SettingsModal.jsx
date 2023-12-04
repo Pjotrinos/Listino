@@ -12,13 +12,15 @@ import {
 
 import { Input } from "@nextui-org/react";
 import { Textarea } from "@nextui-org/react";
-import { Divider } from "@nextui-org/react";
 
 import Icon from "@mdi/react";
 import { mdiCog } from "@mdi/js";
 
+import { useAtom } from 'jotai'
+import { leangueBookAtom, langueSelectAtom }  from '../../state-managment';
 
-function SettingsModal({ inputSettings, ReflectChanges, AcceptButtonText,Text , buttonColor, noIcon }) {
+
+function SettingsModal({ inputSettings, ReflectChanges, AcceptButtonText,Text , buttonColor, noIcon, isIconOnly }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const [formData, setFormData] = useState(inputSettings);
@@ -41,10 +43,13 @@ function SettingsModal({ inputSettings, ReflectChanges, AcceptButtonText,Text , 
     onOpen();
   };
 
+  const [leangueBook] = useAtom(leangueBookAtom)
+  const [langueSelect] = useAtom(langueSelectAtom)
+
   return (
     <>
       <div>
-        <Button color={buttonColor} onPress={() => handleOpen()}> {noIcon===true ? null : <Icon path={mdiCog} size={1} />} {Text} </Button>
+        <Button color={buttonColor} isIconOnly={isIconOnly} onPress={() => handleOpen()}> {noIcon===true ? null : <Icon path={mdiCog} size={1} />} {Text} </Button>
       </div>
 
       <Modal
@@ -62,8 +67,7 @@ function SettingsModal({ inputSettings, ReflectChanges, AcceptButtonText,Text , 
               <ModalBody>
                 <Input
                   type="text"
-                  label="Name of list"
-                  placeholder="Enter name of list"
+                  label={leangueBook[langueSelect].text_setting_listName}
                   isRequired
                   name="listName"
                   value={formData.listName}
@@ -72,17 +76,15 @@ function SettingsModal({ inputSettings, ReflectChanges, AcceptButtonText,Text , 
                 <Textarea
                   isRequired
                   variant="flat"
-                  label="Description"
+                  label={leangueBook[langueSelect].text_setting_listDescription}
                   labelPlacement="inside"
-                  placeholder="Enter your description"
                   name="description"
                   value={formData.description}
                   onChange={handleInputChange}
                 />
                 <Input
                   type="link"
-                  label="Link to image"
-                  placeholder="Enter link"
+                  label={leangueBook[langueSelect].text_setting_listLink}
                   isRequired
                   name="imageLink"
                   value={formData.imageLink}
@@ -91,7 +93,7 @@ function SettingsModal({ inputSettings, ReflectChanges, AcceptButtonText,Text , 
               </ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="light" onPress={onClose}>
-                  Close
+                {leangueBook[langueSelect].text_setting_closeButton}
                 </Button>
                 <Button color="primary" onPress={handleFormSubmit}>
                 {AcceptButtonText}

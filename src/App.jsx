@@ -5,6 +5,9 @@ import ListOfLists from "./pages/ListOfLists";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import NavigationBar from "./components/NavigationBar";
 
+import { useAtom } from 'jotai'
+import { isDarkAtom }  from '../state-managment';
+
 function App() {
   const user = {
     name: "Junior Garcia",
@@ -15,9 +18,11 @@ function App() {
     status: "Active",
   };
 
+  const [isDark, setIsDark] = useAtom(isDarkAtom)
 
   return (
     <>
+    <main className={`${isDark ? 'dark' : ''} text-foreground bg-background`}>
     <Router>
         <NavigationBar/>
         <div>
@@ -27,6 +32,7 @@ function App() {
         </Routes>
       </div>
     </Router>
+    </main>
     </>
   );
 }

@@ -17,6 +17,8 @@ import UserSettingsModal from "../components/UserSettingsModal";
 
 import 'ldrs/ring'
 
+import { leangueBookAtom, langueSelectAtom }  from '../../state-managment';
+import { PieChart, Pie, Sector, Cell, ResponsiveContainer } from 'recharts';
 
 // react router
 import { useParams } from "react-router-dom";
@@ -24,6 +26,8 @@ import { useParams } from "react-router-dom";
 // state managment
 import { useAtom } from "jotai";
 import { ListsAtom } from "../../state-managment";
+import { useWindowSize } from "@uidotdev/usehooks";
+import { mdiPlusBox } from '@mdi/js';
 
 function ListDetail() {
   const { id } = useParams();
@@ -37,6 +41,8 @@ function ListDetail() {
   
   const [fetchList, setfetchList] = useState({});
   const [fetchState,setFetchState] = useState("pending");
+
+  
   
   useEffect(()=>{
     fetch("/api/list/"+id)
@@ -153,11 +159,30 @@ function ListDetail() {
     setLists({...helper})
   }
 
+  const size = useWindowSize();
+  
+  function setSizePrefix(sizeNow){
+    if(sizeNow<=640){
+      return "sm"
+    }
+    else if(sizeNow<=768){
+      return "md"
+    }
+    else if(sizeNow<=1024){
+      return "lg"
+    }
+  }
+
+  const sizePrefix = setSizePrefix(size.width)
+
+  const [leangueBook] = useAtom(leangueBookAtom)
+  const [langueSelect] = useAtom(langueSelectAtom)
+
   return (
-    <div className="flex flex-col gap-4 mx-20 ">
+    <div className="flex flex-col gap-4 sm:mx-8 md:mx-10 lg:mx-20 ">
     { fetchState === "pending" ? <div className="flex flex-row justify-center"> <l-ring className="absolute inset-0" size="60" /> </div> :   
       <><div
-        className="h-56 relative overflow-hidden"
+        className="max-h-20 sm:max-h-20 md:max-h-40 lg:max-h-30 relative overflow-hidden"
         style={{ borderRadius: "var(--nextui-radius-large)" }}
       > 
         <Image
@@ -170,12 +195,13 @@ function ListDetail() {
       </div>
 
       <div className="flex flex-row justify-between">
-        <p className="font-bold text-3xl">{fetchList.listName}</p>
+        <p className="font-bold sm:text-2xl md:text-2xl lg:text-3xl">{fetchList.listName}</p>
         <SettingsModal
           inputSettings={fetchList}
           ReflectChanges={Updatesettings}
-          AcceptButtonText={"Save Changes"}
-          Text={"Settings"}
+          AcceptButtonText={leangueBook[langueSelect].text_setting_acceptButton}
+          Text={sizePrefix=="sm"? null : leangueBook[langueSelect].text_setting_list}
+          isIconOnly= {sizePrefix=="sm"? true : false}
         />
       </div>
 
@@ -183,23 +209,25 @@ function ListDetail() {
 
       <div className="flex justify-between">
         <AvatarGroup
-          max={5}
+          max={sizePrefix=="sm"? 1 : 5}
           total={fetchList.sharedUsers.length}
           renderCount={(count) => (
             <p className="text-small text-foreground font-medium ml-2">
-              +{count} others
+              +{count} {leangueBook[langueSelect].text_otherPeople}
             </p>
           )}
         >
-          {fetchList.sharedUsers.slice(0, 4).map((element) => (
+          {fetchList.sharedUsers.slice(0, sizePrefix=="sm"? 0 : fetchList.sharedUsers.length-1 ).map((element) => (
             <Avatar src={element.avatar} />
           ))}
+
           <Button color="default" isIconOnly radius="full">
             <UserSettingsModal
               people={fetchList.sharedUsers}
               setPeople={UpdatePeople}
             ></UserSettingsModal>
           </Button>
+
         </AvatarGroup>
 
         <div className="flex flex-row gap-x-2.5">
@@ -207,6 +235,7 @@ function ListDetail() {
             color={"default"}
             variant={IsShowChecked ? "solid" : "light"}
             onClick={() => setIsShowChecked((prev) => !prev)}
+            isIconOnly= {sizePrefix=="sm"? true : false}
           >
             {" "}
             {IsShowChecked ? (
@@ -214,11 +243,11 @@ function ListDetail() {
             ) : (
               <Icon path={mdiCircleOutline} size={1} />
             )}{" "}
-            Show checked tasks
+            {sizePrefix=="sm"? null : leangueBook[langueSelect].text_showTasks}
           </Button>
 
-          <Button color="primary" onClick={CreateNewTask}>
-            Add task
+          <Button color="primary" onClick={CreateNewTask} isIconOnly= {sizePrefix=="sm"? true : false}>
+            {sizePrefix=="sm"? <Icon path={mdiPlusBox} size={1} /> : leangueBook[langueSelect].text_addTask}
           </Button>
         </div>
       </div>

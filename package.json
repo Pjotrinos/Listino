@@ -14,12 +14,14 @@
     "@mdi/js": "^7.3.67",
     "@mdi/react": "^1.6.1",
     "@nextui-org/react": "^2.1.13",
+    "@uidotdev/usehooks": "^2.4.1",
     "framer-motion": "^10.16.4",
     "jotai": "^2.5.1",
     "ldrs": "^1.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.17.0"
+    "react-router-dom": "^6.17.0",
+    "recharts": "^2.10.3"
   },
   "devDependencies": {
     "@types/react": "^18.2.15",

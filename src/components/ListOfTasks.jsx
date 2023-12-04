@@ -18,6 +18,9 @@ import {
 import Icon from "@mdi/react";
 import { mdiDotsHorizontal } from "@mdi/js";
 
+import { useAtom } from "jotai";
+import { leangueBookAtom, langueSelectAtom }  from '../../state-managment';
+
 function ListOfTasks({ data, DeleteTask, showChecked, ChangeTask }) {
   const [taskText, setTaskText] = useState(data.taskText);
   const [isChanging, setIsChanging] = useState(false);
@@ -34,6 +37,8 @@ function ListOfTasks({ data, DeleteTask, showChecked, ChangeTask }) {
         setIsChanging(false)
   }
     
+  const [leangueBook] = useAtom(leangueBookAtom)
+  const [langueSelect] = useAtom(langueSelectAtom)
 
   return (
     <div>
@@ -57,7 +62,7 @@ function ListOfTasks({ data, DeleteTask, showChecked, ChangeTask }) {
                 isDisabled={data.isDone}
                 endContent={
                     <>
-                    {isChanging ? <Button variant="light" color="primary"> Save Changes<Kbd keys={["enter"]}></Kbd> </Button>: <></>}
+                    {isChanging ? <Button variant="light" color="primary">{leangueBook[langueSelect].text_setting_acceptButton}<Kbd keys={["enter"]}></Kbd> </Button>: <></>}
                   <Dropdown>
                     <DropdownTrigger>
                       <Button variant="light">
@@ -71,7 +76,7 @@ function ListOfTasks({ data, DeleteTask, showChecked, ChangeTask }) {
                         color="danger"
                         onClick={() => DeleteTask(data.id)}
                       >
-                        Delete task
+                        {leangueBook[langueSelect].text_deleteTask}
                       </DropdownItem>
                     </DropdownMenu>
                   </Dropdown>
