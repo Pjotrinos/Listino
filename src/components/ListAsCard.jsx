@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import Icon from "@mdi/react";
 import { mdiDotsHorizontal } from "@mdi/js";
 
-import { Chip } from "@nextui-org/react";
+import { Chip, Badge } from "@nextui-org/react";
 import { useWindowSize } from "@uidotdev/usehooks";
 
 import { useAtom } from "jotai";
@@ -29,6 +29,7 @@ function ListAsCard({
   DeleteList,
   showArchived,
   isArchived,
+  taskNumber
 }) {
   const navigate = useNavigate();
   
@@ -109,7 +110,7 @@ function ListAsCard({
           
 
             <CardHeader className="pb-0 flex-col items-start">
-              <h4 className="font-bold text-large">{name}</h4>
+            <h4 className="font-bold text-large">{name} <Chip size="sm">{taskNumber}</Chip></h4>
             </CardHeader>
           </CardBody>
         </Card>

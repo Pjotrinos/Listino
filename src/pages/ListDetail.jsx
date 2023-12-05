@@ -1,8 +1,10 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import ListOfTasks from "../components/ListOfTasks";
+import ListChar from "../components/ListChar";
 
-import { Button } from "@nextui-org/react";
+
+import { Button, Tooltip } from "@nextui-org/react";
 import { Image } from "@nextui-org/react";
 import { Avatar, AvatarGroup } from "@nextui-org/react";
 import Icon from "@mdi/react";
@@ -18,7 +20,6 @@ import UserSettingsModal from "../components/UserSettingsModal";
 import 'ldrs/ring'
 
 import { leangueBookAtom, langueSelectAtom }  from '../../state-managment';
-import { PieChart, Pie, Sector, Cell, ResponsiveContainer } from 'recharts';
 
 // react router
 import { useParams } from "react-router-dom";
@@ -42,7 +43,6 @@ function ListDetail() {
   const [fetchList, setfetchList] = useState({});
   const [fetchState,setFetchState] = useState("pending");
 
-  
   
   useEffect(()=>{
     fetch("/api/list/"+id)
@@ -178,6 +178,7 @@ function ListDetail() {
   const [leangueBook] = useAtom(leangueBookAtom)
   const [langueSelect] = useAtom(langueSelectAtom)
 
+
   return (
     <div className="flex flex-col gap-4 sm:mx-8 md:mx-10 lg:mx-20 ">
     { fetchState === "pending" ? <div className="flex flex-row justify-center"> <l-ring className="absolute inset-0" size="60" /> </div> :   
@@ -190,7 +191,6 @@ function ListDetail() {
           src={fetchList.imageLink}
           alt="Cropped Image"
           layout="fill"
-          objectFit="cover"
         />
       </div>
 
@@ -203,7 +203,8 @@ function ListDetail() {
           Text={sizePrefix=="sm"? null : leangueBook[langueSelect].text_setting_list}
           isIconOnly= {sizePrefix=="sm"? true : false}
         />
-      </div>
+        
+      </div>  
 
       <p> {fetchList.description}</p>
 
@@ -218,7 +219,7 @@ function ListDetail() {
           )}
         >
           {fetchList.sharedUsers.slice(0, sizePrefix=="sm"? 0 : fetchList.sharedUsers.length-1 ).map((element) => (
-            <Avatar src={element.avatar} />
+            <Avatar key={element.avatar} src={element.avatar} />
           ))}
 
           <Button color="default" isIconOnly radius="full">
@@ -231,6 +232,9 @@ function ListDetail() {
         </AvatarGroup>
 
         <div className="flex flex-row gap-x-2.5">
+          
+          <ListChar data={fetchList.tasks}></ListChar>
+          
           <Button
             color={"default"}
             variant={IsShowChecked ? "solid" : "light"}
